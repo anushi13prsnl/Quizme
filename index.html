@@ -1,0 +1,351 @@
+<!-- Interactive Quiz Application 
+HTML: Create the quiz structure with questions, options, display score on the navbar and a report at the end of the game and a submit button.
+CSS: Style the quiz interface for a visually appealing look.
+
+JavaScript: Implement quiz logic, including question generation, answer evaluation, scoring, and feedback.
+Data Structures: Use arrays and objects to store quiz questions, answers, and user scores. make 10 general coding related questions-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz Application</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #131842; /* New Primary Color */
+            --secondary-color: #E68369; /* New Secondary Color */
+            --background-color: #FBF6E2; /* New Background Color */
+            --accent-color: #ECCEAE; /* New Accent Color */
+            --text-color: #131842; /* New Text Color */
+            --highlight-color: #E68369; /* New Highlight Color */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            padding-top: 70px; /* Space for fixed navbar */
+            padding-bottom: 50px; /* Space for fixed footer */
+        }
+
+        .quiz-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            margin: auto;
+            margin-top: 15vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8vh;
+        }
+
+        .timer, .score {
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        .question-left {
+            font-size: 1.2em;
+            margin-bottom: 3vh;
+            color: var(--text-color);
+        }
+
+        #report {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        .fixed-bottom {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            font-size: 2vb;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: #fff;
+            margin-right: 4.5vw;
+        }
+
+        .nav-link:hover {
+            color: var(--highlight-color);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--highlight-color);
+            border-color: var(--highlight-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .question {
+            color: var(--text-color);
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .options label {
+            color: var(--text-color);
+        }
+
+        .options input[type="radio"]:checked + label {
+            color: var(--highlight-color);
+        }
+
+        .options label:hover {
+            background-color: var(--highlight-color);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .start-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    z-index: 1000;
+}
+
+#start-button {
+    font-size: 1.5em;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding: 10px 20px;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#"><img src="logo.png" alt="Logo" style="height: 6.5vh;"></a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        </ul>
+    </nav>
+    <div class="quiz-container">
+        <div class="header">
+            <div class="timer" style="background-color: rgba(229, 131, 107, 0.5);">Time left: <span id="timer">30</span> seconds</div>
+            <div class="score" style="background-color: rgba(229, 131, 107, 0.5);">Score: <span id="score">0</span></div>
+        </div>
+        <div class="question-left"style="background-color: rgba(36, 164, 40, 0.5)">Questions left: <span id="questions-left">10</span></div>
+        <div id="quiz"></div>
+        <div class="button-group">
+            <button id="pause" class="btn btn-secondary">Pause</button>
+            <button id="resume" class="btn btn-secondary">Resume</button>
+            <button id="submit" class="btn btn-primary">Submit</button>
+        </div>
+        <div id="report"></div>
+    </div>
+    <footer class="fixed-bottom">
+        <div class="contact-info">
+            <p>Contact us: contactUs@quizme.com</p>
+            <p>Phone: 123-456-7890</p>
+        </div>
+        
+        <div class="social-links">
+            <a href="#"><img src="https://www.transparentpng.com/download/facebook-logo/facebook-icon-transparent-background-20.png" alt="Facebook" style="height: 20px;"></a>
+            <a href="#"><img src="https://img.freepik.com/premium-vector/x-new-social-network-black-app-icon-twitter-rebranded-as-x-twitter-s-logo-was-changed_277909-649.jpg" alt="Twitter" style="height: 20px;"></a>
+            <a href="#"><img src="insta.png" alt="Instagram" style="height: 20px;"></a>
+        </div>
+        <br>
+        &copy; 2023 Quiz Application
+        all rights reserved
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        const quizData = [
+    {
+        question: "What does HTML stand for?",
+        options: ["Hyper Text Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language"],
+        answer: "Hyper Text Markup Language"
+    },
+    {
+        question: "What does CSS stand for?",
+        options: ["Cascading Style Sheets", "Creative Style Sheets", "Computer Style Sheets"],
+        answer: "Cascading Style Sheets"
+    },
+    {
+        question: "What does JS stand for?",
+        options: ["JavaScript", "JavaSource", "JustScript"],
+        answer: "JavaScript"
+    },
+    {
+        question: "Which language is used for web apps?",
+        options: ["PHP", "Python", "JavaScript"],
+        answer: "JavaScript"
+    },
+    {
+        question: "What does SQL stand for?",
+        options: ["Structured Query Language", "Stylish Question Language", "Statement Question Language"],
+        answer: "Structured Query Language"
+    },
+    {
+        question: "What does XML stand for?",
+        options: ["eXtensible Markup Language", "eXecutable Multiple Language", "eXtra Multi-Program Language"],
+        answer: "eXtensible Markup Language"
+    },
+    {
+        question: "Which company developed JavaScript?",
+        options: ["Netscape", "Bell Labs", "Sun Microsystems"],
+        answer: "Netscape"
+    },
+    {
+        question: "Which HTML attribute is used to define inline styles?",
+        options: ["style", "class", "font"],
+        answer: "style"
+    },
+    {
+        question: "Which property is used to change the background color in CSS?",
+        options: ["background-color", "color", "bgcolor"],
+        answer: "background-color"
+    },
+    {
+        question: "Which HTML element is used to specify a footer for a document or section?",
+        options: ["footer", "bottom", "section"],
+        answer: "footer"
+    }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let timer;
+let timeLeft = 30;
+let isPaused = false;
+
+const quizContainer = document.getElementById('quiz');
+const scoreDisplay = document.getElementById('score');
+const submitButton = document.getElementById('submit');
+const pauseButton = document.getElementById('pause');
+const resumeButton = document.getElementById('resume');
+const reportContainer = document.getElementById('report');
+const timerDisplay = document.getElementById('timer');
+const questionsLeftDisplay = document.getElementById('questions-left');
+
+function loadQuestion() {
+    const questionData = quizData[currentQuestion];
+    quizContainer.innerHTML = `
+        <div class="question">Question ${currentQuestion + 1}: ${questionData.question}</div>
+        <div class="options">
+            ${questionData.options.map((option, index) => `
+                <label>
+                    <input type="radio" name="option" value="${option}">
+                    ${option}
+                </label>
+            `).join('')}
+        </div>
+    `;
+    questionsLeftDisplay.textContent = quizData.length - currentQuestion - 1;
+    resetTimer();
+}
+
+function checkAnswer() {
+    const selectedOption = document.querySelector('input[name="option"]:checked');
+    if (selectedOption && selectedOption.value === quizData[currentQuestion].answer) {
+        score++;
+        scoreDisplay.textContent = score;
+    }
+}
+
+function showReport() {
+    reportContainer.innerHTML = `You scored ${score} out of ${quizData.length}`;
+}
+
+function resetTimer() {
+    clearInterval(timer);
+    timeLeft = 30;
+    timerDisplay.textContent = timeLeft;
+    timer = setInterval(() => {
+        if (!isPaused) {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                checkAnswer();
+                currentQuestion++;
+                if (currentQuestion < quizData.length) {
+                    loadQuestion();
+                } else {
+                    quizContainer.style.display = 'none';
+                    submitButton.style.display = 'none';
+                    pauseButton.style.display = 'none';
+                    resumeButton.style.display = 'none';
+                    showReport();
+                }
+            }
+        }
+    }, 1000);
+}
+
+submitButton.addEventListener('click', () => {
+    checkAnswer();
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+        loadQuestion();
+    } else {
+        quizContainer.style.display = 'none';
+        submitButton.style.display = 'none';
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'none';
+        showReport();
+    }
+});
+
+pauseButton.addEventListener('click', () => {
+    isPaused = true;
+});
+
+resumeButton.addEventListener('click', () => {
+    isPaused = false;
+});
+
+loadQuestion();
+</script>
+
+<div id="start-overlay" class="start-overlay">
+    <button id="start-button" class="btn btn-primary">Click here to start Quiz</button>
+</div>
+<script>
+    document.getElementById('start-button').addEventListener('click', function() {
+        document.getElementById('start-overlay').style.display = 'none';
+        document.querySelector('.quiz-container').style.display = 'block';
+    });
+
+    // Initially hide the quiz container
+    document.querySelector('.quiz-container').style.display = 'none';
+</script>
+
+</body>
+</html>
+ 
